@@ -2,7 +2,7 @@
   "name": "kittytask",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://Hamzaalsafi.github.io/KittyTask2",
+  "homepage": "https://Hamzaalsafi.github.io/Trello",
   "type": "module",
   "scripts": {
     "dev": "vite",

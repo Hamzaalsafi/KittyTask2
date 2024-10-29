@@ -105,8 +105,8 @@ const arrowLeft=()=>{
     transition={{ duration: 0.4 }}
   >
     
-    <div className='flex justify-center '>
-      <h1 className='NewtonsCradleH1 absolute ml-1.5 text-center text-gray-300 top-[13.8%] sm:top-[13.5%] pointer-events-none   text-5xl'>   Welcome</h1>
+    <div className='flex justify-center relative'>
+      <h1 className='NewtonsCradleH1 absolute ml-1.5 text-center text-gray-300 top-[13.7%] sm:top-[13.5%] pointer-events-none w-[63%]  sm:w-1/3 text-5xl'>   Welcome</h1>
       <h1 className=' absolute ml-1.5 text-center text-gray-300 top-[14.5%] sm:top-[13.1%] pointer-events-none  sm:text-4xl  text-3xl'>{text}<Cursor/></h1>
     <hr className='NewtonsCradleHr'
 

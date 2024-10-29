@@ -72,7 +72,6 @@ body {
     opacity: 0;
   }
 
-
 .toggle--checkbox {
     display: none;
 }
@@ -94,7 +93,7 @@ body {
     position: absolute;
     top:6%;
     left: 43%;
-    z-index: -1;
+    z-index: 1;
   }
   @media (700px>width) {
     .graph__wrapper {
@@ -111,7 +110,7 @@ body {
 
    transform: rotateY(180deg) rotateX(180deg);
     left: 25%;
-    z-index: -1;
+    z-index: 1;
   }
  
   @media (700px>width) {
@@ -165,7 +164,7 @@ body {
     width: 85%;
     position: absolute;
     top: 18.91%;
-    border-radius: 20%;
+    border-radius: 30%;
 }
 @media (width>700px) {
     .NewtonsCradleHr{
