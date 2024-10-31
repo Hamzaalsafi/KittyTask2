@@ -41,8 +41,8 @@ export function MiniBoard(Board) {
     };
 
     return (
-        <div ref={ref} style={style} onClick={BoardClick} className={`p-5 min-w-[130px] hover:opacity-85 cursor-pointer rounded-sm ${Board.background}`}>
-            <h2 className='text-zinc-50 text-lg truncate whitespace-nowrap overflow-hidden'>{Board.title}</h2>
+        <div ref={ref} style={style} onClick={BoardClick} className={`p-5 h-[70px]  w-[130px] hover:opacity-85 cursor-pointer rounded-sm ${Board.background}`}>
+            <h2 className='text-zinc-900 text-lg truncate whitespace-nowrap overflow-hidden'>{Board.title}</h2>
         </div>
     );
 }

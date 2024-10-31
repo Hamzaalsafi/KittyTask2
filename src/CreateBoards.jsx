@@ -32,6 +32,7 @@ export function CreateBoards() {
   const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
+
   const [background,setBackground]=useState('');
   const [images,setImages]=useState('');
   const [boardTitle, setBoardTitle] = useState("");
@@ -130,30 +131,30 @@ const handleTitle=(e)=>{
     }
   }
   return (
-<div className='flex  mt-10 items-center z-10  w-screen h-screen px-7  flex-col'>
+<div className='flex  items-center z-10 sm:mt-10  w-screen h-screen px-7  flex-col justify-start '>
      
-<img draggable={false}  style={style}   src="https://trello.com/assets/14cda5dc635d1f13bc48.svg" className={`w-[60%] p-1 px-2 max-w-[210px] mb-6 mt-[-70px]  select-none sm:mt-[-50px] ${background}`}/>
+<img draggable={false}  style={style}   src="https://trello.com/assets/14cda5dc635d1f13bc48.svg" className={`w-[50%] p-1 px-2 max-w-[210px] mb-5 mt-[-27%]  select-none sm:mt-[-50px] ${background}`}/>
 
-<div className="flex w-[100%] max-w-[470px] justify-between items-center ">
+<div className="flex w-[80%] max-w-[470px] justify-center gap-4 md:gap-10 items-center ">
       <div className="main">
       <input 
       onChange={(e)=>{handleTitle(e)}}
-         
+   required={true}
         type="text" 
-        className="input "
+        className="input"
       />
-      <label>
-        <span style={{ transitionDelay: '0ms', left: '0px' }}>B</span>
-        <span style={{ transitionDelay: '75ms', left: '15px' }}>o</span>
-        <span style={{ transitionDelay: '150ms', left: '30px' }}>a</span>
-        <span style={{ transitionDelay: '225ms', left: '44px' }}>r</span>
-        <span style={{ transitionDelay: '300ms', left: '53px' }}>d</span>
-        <span style={{ transitionDelay: '375ms', left: '80px' }}>T</span>
-        <span style={{ transitionDelay: '450ms', left: '94px' }}>i</span>
-        <span style={{ transitionDelay: '525ms', left: '101px' }}>t</span>
-        <span style={{ transitionDelay: '600ms', left: '111px' }}>l</span>
-        <span style={{ transitionDelay: '675ms', left: '118px' }}>e</span>
-        <p className=' absolute left-[18px] top-[4px] text-2xl m-2 text-gray-300 transition duration-500 cursor-pointer pointer-events-none'
+      <label  >
+        <span style={{ transitionDelay: '0ms', left: '10px' }}>B</span>
+        <span style={{ transitionDelay: '75ms', left: '27px' }}>o</span>
+        <span style={{ transitionDelay: '150ms', left: '42px' }}>a</span>
+        <span style={{ transitionDelay: '225ms', left: '57px' }}>r</span>
+        <span style={{ transitionDelay: '300ms', left: '66px' }}>d</span>
+        <span style={{ transitionDelay: '375ms', left: '88px' }}>T</span>
+        <span style={{ transitionDelay: '450ms', left: '104px' }}>i</span>
+        <span style={{ transitionDelay: '525ms', left: '111px' }}>t</span>
+        <span style={{ transitionDelay: '600ms', left: '120px' }}>l</span>
+        <span style={{ transitionDelay: '675ms', left: '127px' }}>e</span>
+        <p className=' absolute left-[18px]  top-[4px] text-2xl m-2 text-gray-300 transition duration-500 cursor-pointer pointer-events-none'
         >
           Board Title
         </p>
@@ -193,48 +194,48 @@ const handleTitle=(e)=>{
     </div >
     <div className=' self-center '>
       <h1 className='text-xl mt-4 mb-1 opacity-90 text-gray-300  text-center'>Background</h1>
-      <div className='color max-h-[150px] mb-4 rounded-md px-3 overflow-y-auto container bg-neutral-800'>
-      <div className='grid grid-cols-3 sm:grid-cols-2  mt-2 md:grid-cols-3 p-1  lg:grid-cols-4 gap-5'>
+      <div className='color max-h-[20vh] sm:max-h-[155px] mb-4 rounded-md px-3 overflow-y-auto container bg-neutral-800'>
+      <div className='grid grid-cols-3 sm:grid-cols-2  mt-1 md:grid-cols-3 p-1  lg:grid-cols-4 gap-5'>
 
-      <div onClick={()=>{setBackground("bg-gradient-to-r from-teal-400 to-blue-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='cursor-pointer bg-gradient-to-r from-teal-400 to-blue-500 py-7  rounded-sm'>
+      <div onClick={()=>{setBackground("bg-gradient-to-r from-teal-400 to-blue-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='cursor-pointer bg-gradient-to-r from-teal-400 to-blue-500 py-6 sm:py-7  rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-gradient-to-r from-blue-800 to-blue-400"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r cursor-pointer from-blue-800 to-blue-400 py-7 rounded-sm'>
+  <div onClick={()=>{setBackground("bg-gradient-to-r from-blue-800 to-blue-400"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r cursor-pointer from-blue-800 to-blue-400 py-6 sm:py-7rounded-sm'>
   </div>
-     <div onClick={()=>{setBackground("bg-gradient-to-r from-purple-500 to-pink-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}}  className='bg-gradient-to-r from-purple-500 to-pink-500 py-7 cursor-pointer rounded-sm'>
+     <div onClick={()=>{setBackground("bg-gradient-to-r from-purple-500 to-pink-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}}  className='bg-gradient-to-r from-purple-500 to-pink-500 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-gradient-to-r from-purple-400 to-blue-300"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-purple-400 to-blue-300 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-gradient-to-r from-purple-400 to-blue-300"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-purple-400 to-blue-300 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-gradient-to-r from-orange-400 to-yellow-300"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-orange-400 to-yellow-300 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-gradient-to-r from-orange-400 to-yellow-300"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-orange-400 to-yellow-300 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-gradient-to-r from-pink-400 to-pink-200"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-pink-400 to-pink-200 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-gradient-to-r from-pink-400 to-pink-200"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-pink-400 to-pink-200 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-gradient-to-r from-teal-400 to-green-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-teal-400 to-green-500 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-gradient-to-r from-teal-400 to-green-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-teal-400 to-green-500 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-gradient-to-r from-blue-800 to-blue-400"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-blue-800 to-blue-400 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-gradient-to-r from-blue-800 to-blue-400"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-blue-800 to-blue-400 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-gradient-to-r from-red-800 to-brown-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-red-800 to-brown-500 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-gradient-to-r from-red-800 to-brown-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gradient-to-r from-red-800 to-brown-500 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-blue-500");if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-blue-500 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-blue-500");if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-blue-500 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-orange-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-orange-500 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-orange-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-orange-500 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-green-50"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-green-500 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-green-50"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-green-500 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-red-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-red-500 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-red-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-red-500 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-purple-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-purple-500 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-purple-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-purple-500 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-pink-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-pink-500 py-7 cursor-pointer rounded-sm'>   </div>
-  <div onClick={()=>{setBackground("bg-green-300"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-green-300 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-pink-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-pink-500 py-6 sm:py-7 cursor-pointer rounded-sm'>   </div>
+  <div onClick={()=>{setBackground("bg-green-300"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-green-300 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-cyan-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-cyan-500 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-cyan-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-cyan-500 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
-  <div onClick={()=>{setBackground("bg-gray-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gray-500 py-7 cursor-pointer rounded-sm'>
+  <div onClick={()=>{setBackground("bg-gray-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='bg-gray-500 py-6 sm:py-7 cursor-pointer rounded-sm'>
   </div>
     </div>
  </div>
- <div className='color max-h-[150px] sm:max-h-[165px]  rounded-md px-3 overflow-y-auto container bg-neutral-800'>
-      <div className='grid grid-cols-3 sm:grid-cols-2  mt-2 md:grid-cols-3 p-1  lg:grid-cols-4 gap-5'>
+ <div className='color max-h-[20vh]  sm:max-h-[155px]  rounded-md sm:px-3 px-2 overflow-y-auto container bg-neutral-800'>
+      <div className='grid grid-cols-3 sm:grid-cols-2  mt-1 md:grid-cols-3 p-1  lg:grid-cols-4 gap-5'>
      
   {
     imgBackground.map((img)=>(
@@ -247,8 +248,8 @@ const handleTitle=(e)=>{
       key={img}
    
       onClick={()=>{setBackground(""); setImages(img); if(failed==="Make sure you choose a background and images"){setFailed("")}}}
-       className ='border-gray-100 cursor-pointer text-opacity-0  bg-black p-4 sm:p-5 select-none  rounded-sm'>
-        Board 1
+       className ='border-gray-100 cursor-pointer text-opacity-0  bg-black p-4 py-3 sm:py-4 px-5 sm:px-6 select-none  rounded-sm'>
+        Board
       </div>
     ))
   }
@@ -257,7 +258,7 @@ const handleTitle=(e)=>{
  </div>
 
   <div className='flex items-center   justify-center'>
-  <button onClick={createBoard} type='submit' className="bg-blue-600 hover:bg-blue-500 text-gray-100  mb-3 py-1.5 px-20 mt-8 rounded-lg  text-md">
+  <button onClick={createBoard} type='submit' className="bg-blue-600 hover:bg-blue-500 text-gray-100  mb-1 py-1.5 px-20 mt-[6%] sm:mt-8 rounded-lg  text-md">
           Create
 </button>
 </div>

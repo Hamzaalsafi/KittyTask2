@@ -4,13 +4,13 @@ import { collection,updateDoc, onSnapshot,getDocs, doc, setDoc, deleteDoc } from
 import { db } from './firebase2'; 
 import { auth } from './firebase2';
 import { onAuthStateChanged } from 'firebase/auth'; 
-import { DndContext,TouchSensor, closestCenter, useSensor, useSensors, MouseSensor } from '@dnd-kit/core';
+import { DndContext,TouchSensor,PointerSensor , closestCenter, useSensor, useSensors, MouseSensor } from '@dnd-kit/core';
 
 import { useMenuContext } from './MenuProvider';
 import { useSortable } from '@dnd-kit/sortable';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 
-export const List = forwardRef(({item,Dragging, title, id,BoardId }, ref) => {
+export const List = forwardRef(({item,Dragging, title, id,BoardId ,sharedWith}, ref) => {
   const [createCard, setCreateCard] = useState(false);
   const AddingListRef = useRef(null);
   const [cardTitle, setCardTitle] = useState('');
@@ -76,7 +76,6 @@ const handleMouseDown = (event) => {
       try {
         setCardTitle('');
         const cardId = new Date().getTime().toString();
-        const cardDocRef = doc(db,`users/${user.uid}/Boards/${BoardId}/Lists/${id}/cards`, cardId);
         const labels = {
           label1: false,
           label2: false,
@@ -87,19 +86,37 @@ const handleMouseDown = (event) => {
           label7: false,
           label8: false
         };
-  
-        const newCard = { id: cardId, title: cardTitle, labels };
+        const backgroundColor ="bg-gray-800";
+        const newCard = { id: cardId, title: cardTitle, labels,background:backgroundColor};
   
         setCards((prevCards) => [...prevCards, newCard]);
   
+   
+        const cardDocRef = doc(db, `users/${user.uid}/Boards/${BoardId}/Lists/${id}/cards`, cardId);
         await setDoc(cardDocRef, {
           id: cardId,
           title: cardTitle,
-          labels:labels,
-          order:cards.length
+          labels: labels,
+          order: cards.length,
+          background:backgroundColor
         });
   
-        console.log('Card added successfully');
+        console.log('Card added successfully for current user');
+ 
+        const sharedUpdatePromises = sharedWith.map((sharedUser) => {
+          const sharedCardDocRef = doc(db, `users/${sharedUser.id}/Boards/${BoardId}/Lists/${id}/cards`, cardId);
+          return setDoc(sharedCardDocRef, {
+            id: cardId,
+            title: cardTitle,
+            labels: labels,
+            order: cards.length,
+            background:backgroundColor
+          });
+        });
+  
+        await Promise.all(sharedUpdatePromises);
+  
+        console.log('Card added successfully for all shared users');
   
       } catch (error) {
         console.error('Error adding card to Firestore: ', error);
@@ -119,7 +136,8 @@ const handleMouseDown = (event) => {
             id: doc.id,
             title: doc.data().title,
             labels: doc.data().labels,
-            order: doc.data().order
+            order: doc.data().order,
+            background:doc.data().background
           })).sort((a, b) =>a.order - b.order);
   
           setCards(cardsTemp);
@@ -164,10 +182,9 @@ const handleMouseDown = (event) => {
  
   
   const handleDragEnd = async (event) => {
-
     const { active, over } = event;
   
-    if (active.id !== over?.id) {
+    if (active.id && over?.id) {
       const user = auth.currentUser;
   
       if (user) {
@@ -180,15 +197,30 @@ const handleMouseDown = (event) => {
           try {
             setCards(updatedItems);
   
+          
             const updatePromises = updatedItems.map((item, index) =>
               updateDoc(doc(db, `users/${user.uid}/Boards/${BoardId}/Lists/${id}/cards`, item.id), {
                 order: index,
                 title: item.title,
                 labels: item.labels,
+                background: item.background,
               })
             );
   
-            await Promise.all(updatePromises);
+
+            const sharedUpdatePromises = sharedWith.map((sharedUser) =>
+              updatedItems.map((item, index) =>
+                updateDoc(doc(db, `users/${sharedUser.id}/Boards/${BoardId}/Lists/${id}/cards`, item.id), {
+                  order: index,
+                  title: item.title,
+                  labels: item.labels,
+                  background: item.background,
+                })
+              )
+            );
+  
+            // Flatten and await all promises
+            await Promise.all([...updatePromises, ...sharedUpdatePromises.flat()]);
           } catch (error) {
             console.error('Error updating cards:', error);
           }
@@ -198,6 +230,7 @@ const handleMouseDown = (event) => {
       }
     }
   };
+  
   const [isPhone, setIsPhone] = useState(window.innerWidth <= 650);
 
   useEffect(() => {
@@ -225,10 +258,77 @@ const handleMouseDown = (event) => {
  
   };
   const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor) 
-  );
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        delay: 100,
+        tolerance: 5 // Adding a tolerance property
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 100,
+        tolerance: 5 // Adding a tolerance property
+      },
+    })
+  )
+  const handleCardDeletion = async (deletedCardId) => {
+    const user = auth.currentUser;
   
+    // Step 1: Update the local state
+    setCards((prevCards) => {
+      const updatedCards = prevCards
+        .filter((card) => card.id !== deletedCardId)
+        .map((card, index) => ({ ...card, order: index })); 
+  
+      return updatedCards;
+    });
+  
+    if (user) {
+      try {
+     
+        const updatedCards = cards.filter((card) => card.id !== deletedCardId);
+  
+    
+        await deleteDoc(doc(db, `users/${user.uid}/Boards/${BoardId}/Lists/${id}/cards`, deletedCardId));
+  
+        
+        const updateCurrentUserPromises = updatedCards.map((card, index) =>
+          updateDoc(doc(db, `users/${user.uid}/Boards/${BoardId}/Lists/${id}/cards`, card.id), {
+            order: index,
+            title: card.title,
+            labels: card.labels,
+            background:card.background
+          })
+        );
+  
+        
+        const sharedUpdatePromises = sharedWith.map((sharedUser) => {
+          const sharedDeletePromise = deleteDoc(doc(db, `users/${sharedUser.id}/Boards/${BoardId}/Lists/${id}/cards`, deletedCardId));
+  
+          const sharedOrderUpdatePromises = updatedCards.map((card, index) =>
+            updateDoc(doc(db, `users/${sharedUser.id}/Boards/${BoardId}/Lists/${id}/cards`, card.id), {
+              order: index,
+              title: card.title,
+              labels: card.labels,
+              background:card.background
+            })
+          );
+  
+          return [sharedDeletePromise, ...sharedOrderUpdatePromises];
+        }).flat(); 
+  
+        // Await all deletion and update operations
+        await Promise.all([...updateCurrentUserPromises, ...sharedUpdatePromises]);
+  
+        console.log("Card deleted and orders updated for all shared users");
+  
+      } catch (error) {
+        console.error("Error updating card title: ", error);
+      }
+    } else {
+      console.error("User is not authenticated");
+    }
+  };
   return (
 <div style={style} className={`bg-black ListCssCustom p-4 px-3 pt-2.5 shadow-xl  rounded-xl h-fit ${Dragging&&!isDragging ? 'swing' : ''} ${!Dragging||!isDragging ? 'snap-start' : ''}  ${isDragging?'dragList': ""}`}>
     <div 
@@ -240,10 +340,10 @@ const handleMouseDown = (event) => {
    
     >
       <div className="flex overflow-x-hidden justify-between items-start">
-        <h3 className="focus:border-solid focus:border-blue-500 focus:box-shadow focus:outline-none text-slate-300 px-1 text-lg mt-1.5 w-full mr-2">
+        <h3 className="focus:border-solid select-none focus:border-blue-500 focus:box-shadow focus:outline-none text-slate-300 px-1 text-lg mt-1.5 w-full mr-2">
           {title}
         </h3>
-        <button onClick={() => deleteList(id)} className="text-slate-300 text-xl">...</button>
+        <button onClick={() => console.log("worked")} className="text-slate-300 select-none text-xl">...</button>
       </div>
     
       <div     onTouchStart={handleTouchStart}  onMouseDown={handleMouseDown}  className=" flex  pr-1.5 flex-col justify-start kkkk my-3 items-center">
@@ -256,9 +356,12 @@ const handleMouseDown = (event) => {
                 key={item.id} 
                 listid={id}
                 title={item.title}  
+                BG={item.background}
                 id={item.id} 
                 labels={item.labels}
                 item={item}
+                onDeleteCard={handleCardDeletion}
+                sharedWith={sharedWith}
               />
             ))}
           </SortableContext>
@@ -270,7 +373,7 @@ const handleMouseDown = (event) => {
       {!createCard && (
         <button 
           onClick={AddAnotherList} 
-          className="text-slate-300 text-opacity-95 hover:opacity-100 hover:bg-zinc-800 hover:bg-opacity-90 hover:shadow-xl w-full text-start px-1.5 py-1  rounded-md"
+          className="text-slate-300 select-none text-opacity-95 hover:opacity-100 hover:bg-zinc-800 hover:bg-opacity-90 hover:shadow-xl w-full text-start px-1.5 py-1  rounded-md"
         >
           + Add a card
         </button>

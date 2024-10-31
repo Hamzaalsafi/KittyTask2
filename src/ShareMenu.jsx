@@ -7,46 +7,65 @@ export function ShareMenu( {BoardMember,visibility,id,Board}) {
     const [email,setEmail]=useState("");
 
     const addMembers = async () => {
-
-        try {
-          if (!email) {
-            console.error("Email is required.");
-            return;
-          }
-          const usersCollection = collection(db, 'users');
-          const querySnapshot = await getDocs(usersCollection);
-          let foundUser = null;
-          querySnapshot.forEach((doc) => {
-            const userData = doc.data();
-            if (userData.email === email) {
-              foundUser = { id: doc.id, ...userData };
-              console.log("User found: ", foundUser);
-            }
-          });
-          if (!foundUser) {
-            console.log("No user found with that email.");
-          } else {
-
-            setBoardMember([...boardMember, foundUser]);
-      
-            try {
-                
-                await updateDoc( doc(db, `users/${boardMember[0].id}/Boards/${id}`), { sharedWith:[...boardMember, foundUser] });
-                const BoardDocRef = doc(db, `users/${foundUser.id}/Boards`, id);
-                await setDoc(BoardDocRef, Board);
-               
-              } catch (error) {
-                console.error("Error updating card title: ", error);
-              }
-          }
-        } catch (error) {
-          console.error("Error fetching users: ", error);
+      try {
+        if (!email) {
+          console.error("Email is required.");
+          return;
         }
+    
+        const usersCollection = collection(db, 'users');
+        const querySnapshot = await getDocs(usersCollection);
+        let foundUser = null;
+    
+        // Search for the user by email
+        querySnapshot.forEach((doc) => {
+          const userData = doc.data();
+          if (userData.email === email) {
+            foundUser = { id: doc.id, ...userData };
+            console.log("User found: ", foundUser);
+          }
+        });
+    
+        if (!foundUser) {
+          console.log("No user found with that email.");
+          return;
+        } else {
+          // Update local state to include the new member
+          setBoardMember((prevMembers) => [...prevMembers, foundUser]);
+    
+          const updatedSharedWith = [...boardMember, foundUser];
+          
+          try {
+            // Update the sharedWith field for the current user's board
+            const currentUserBoardRef = doc(db, `users/${boardMember[0].id}/Boards/${id}`);
+            await updateDoc(currentUserBoardRef, { sharedWith: updatedSharedWith });
+    
+            // Set up the board for the new member if they don’t already have it
+            const newMemberBoardRef = doc(db, `users/${foundUser.id}/Boards/${id}`);
+            await setDoc(newMemberBoardRef, { ...Board.data, sharedWith: updatedSharedWith }, { merge: true });
+    
+            // Update the sharedWith field for all existing board members
+            const updatePromises = updatedSharedWith.map((member) => {
+              const memberBoardRef = doc(db, `users/${member.id}/Boards/${id}`);
+              return updateDoc(memberBoardRef, { sharedWith: updatedSharedWith });
+            });
+    
+            await Promise.all(updatePromises);
+    
+            console.log("Member added successfully and sharedWith updated for all members.");
+          } catch (error) {
+            console.error("Error updating sharedWith: ", error);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching users: ", error);
       }
+    };
+    
     return (
         
         <div className='bg-zinc-800 flex flex-col absolute  sm:top-24 top-[5.55em] z-[10000]   right-3  h-fit w-fit py-3 rounded-lg px-3.5 justify-start'>
-     {visibility==="private"&&( <div className='w-[100%]  top-[-.2%]  p-1 right-[.1px]  h-[100%] absolute rounded-lg bg-zinc-950 bg-opacity-90 flex justify-center items-center'>
+     {visibility==="private"&&( <div className='w-[100%]  top-[-.2%]  p-1 right-[.1px]  h-[100%] absolute rounded-lg bg-zinc-950 bg-opacity-85 flex justify-center items-center'>
         <div className='flex flex-col'>
         <h1 className='text-gray-300 text-center text-lg'>This Board is private.</h1>
         <p className='text-gray-300 text-center text-sm'>To share it with others,switch it to shareable mode.</p>
@@ -86,7 +105,7 @@ export function ShareMenu( {BoardMember,visibility,id,Board}) {
                     border: '1.5px solid #555'
                     }}
                 >
-                 {member.avatar.initials}
+                 {member.avatar.initials.toUpperCase()}
                   </div>
                 </div> 
                 <div>  

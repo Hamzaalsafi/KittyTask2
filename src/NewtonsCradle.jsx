@@ -10,14 +10,14 @@ const NewtonsCradle = () => {
     const engine = Engine.create();
     const world = engine.world;
   
-    const screenWidth = window.innerWidth < 700 ? window.innerWidth-window.innerWidth*.25 : 600;
+    const screenWidth = window.innerWidth < 700 ? window.innerWidth : 600;
     const screenHeight = window.innerHeight;
     const render = Matter.Render.create({
       element: sceneRef.current,
       engine: engine,
       options: {
-        width: screenWidth,
-        height: 700,
+        width: screenWidth+150,
+        height: 900,
         wireframes: false,
         background: 'transparent',
       },

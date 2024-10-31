@@ -7,7 +7,7 @@ const GraphLeft = () => {
 
   return (
     <div className="graph__wrapper2">
-     <svg width="220px"  viewBox="0 0 315 107" version="1.1" style={{ overflow: "visible" }}>
+     <svg width="80%"  viewBox="0 0 315 107" version="1.1" style={{ overflow: "visible" }}>
         <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
           <path 
             id="Path-1"

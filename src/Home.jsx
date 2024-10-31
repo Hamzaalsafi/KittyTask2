@@ -40,8 +40,8 @@ const arrowLeft=()=>{
 }
 
   return (
-    <div className='bg-zinc-800 overflow-x-hidden box-border   h-screen flex overflow-y-hidden p-5 justify-center homecontiner'>
-      <div className='flex sm:w-[100%] mb-2   items-center mt-[40%] sm:shadow-xl  max-w-[800px] flex-col md:mt-[10%]'>
+    <div className='bg-zinc-800 overflow-x-hidden box-border   h-screen flex  overflow-y-hidden p-5 justify-center homecontiner'>
+      <div className='flex sm:w-[100%] mb-2  items-center  mt-[40%] sm:shadow-xl  max-w-[900px] flex-col sm:mt-[10%]'>
       <svg 
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -106,15 +106,15 @@ const arrowLeft=()=>{
   >
     
     <div className='flex justify-center relative'>
-      <h1 className='NewtonsCradleH1 absolute ml-1.5 text-center text-gray-300 top-[13.7%] sm:top-[13.5%] pointer-events-none w-[63%]  sm:w-1/3 text-5xl'>   Welcome</h1>
-      <h1 className=' absolute ml-1.5 text-center text-gray-300 top-[14.5%] sm:top-[13.1%] pointer-events-none  sm:text-4xl  text-3xl'>{text}<Cursor/></h1>
-    <hr className='NewtonsCradleHr'
-
+   
+      <h1 className=' absolute ml-1.5 text-center text-gray-300 top-[13.8%] sm:top-[13.1%] pointer-events-none  text-2xl sm:text-3xl  '>{text}<Cursor/></h1>
+  
+  <hr className='NewtonsCradleHr '
     />
  
-    <GraphAnimation/>
+    <GraphAnimation className />
     <GraphLeft/>
-    <NewtonsCradle className='max-w-[70%] w-64' />
+    <NewtonsCradle className=' absolute'/>
 
     </div>
   </motion.div>

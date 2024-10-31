@@ -3,7 +3,7 @@ import { getFirestore, setDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'; 
  import { auth } from './firebase2';
- 
+ import { ThreeDot } from 'react-loading-indicators';
 export function Login() {
     const [animate, setAnimate] = useState(false);
     const [email, setEmail] = useState('');
@@ -14,26 +14,30 @@ export function Login() {
     const [email2, setEmail2] = useState('');
     const [password2, setPassword2] = useState('');
     const [error2, setError2] = useState('');
-
+    const [loading, setLoading] = useState(false); // Loading state
     const db = getFirestore();
     const handleLogin = async (e) => {
       e.preventDefault();
       setError('');
-   
-
+      setLoading(true); // Set loading to true at the start
+  
       if (!email || !password) {
           setError('Please fill in both email and password.');
+          setLoading(false); // Stop loading if validation fails
           return;
       }
-
+  
       try {
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
-         
-     
+          
+          // Optionally, handle userCredential if needed
+          
           navigate('/Home'); 
       } catch (error) {
           console.error('Login error:', error);
           setError('Error logging in: ' + error.message);
+      } finally {
+          setLoading(false); // Stop loading when finished
       }
   };
   const getColorFromName = (name) => {
@@ -58,6 +62,8 @@ export function Login() {
       return;
     }
   
+    setLoading(true); // Start loading
+  
     const auth2 = getAuth();
     try {
       const userCredential = await createUserWithEmailAndPassword(auth2, email2, password2);
@@ -71,29 +77,40 @@ export function Login() {
         name: name2,
         email: email2,
         createdAt: new Date(),
-        avatar: { color: avatarColor, initials: initials }, // Save avatar details in Firestore
+        avatar: { color: avatarColor, initials: initials }, 
       });
   
       navigate('/Home'); 
     } catch (error) {
       console.error('Error creating account:', error);
       setError2('Error creating account: ' + error.message);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
+
     const handleAnimation = () => {
         setAnimate(!animate);
     };
   return (
-    <div className='h-screen  flex justify-center items-center '>
-    <div className={`flex mx-52 my-auto  p-20 py-52 shadow-2xl justify-center rounded-xl    items-center gap-52 logincontainer ${animate ? 'animate-right' : ''}`}>
+    <div className='h-screen w-screen  flex justify-center items-center overflow-y-hidden  '>
+     {loading && (
+  <div className='flex flex-col justify-center items-center gap-6 p-4 '>
+    <ThreeDot variant="bounce" color="#d33dad" size="large" text="" textColor="#f8f8f8" />
+    <p className='text-[1.3rem] font-bold text-center text-gray-900' style={{ maxWidth: '350px' }}>
+      Hang tight! We're preparing everything for you...
+    </p>
+  </div>
+)}
+    {!loading&&(<div className={`flex mx-52 my-auto  p-20 py-52 shadow-2xl justify-center rounded-xl  items-center gap-[17%] sm:gap-40 logincontainer ${animate ? 'animate-right' : ''}`}>
       <div className=' flex flex-col justify-center items-center  '>
       <div className='signinmode flex flex-col justify-start items-center'>
-            <h1 className=' text-center text-2xl text-gray-100 mb-2 '>Already have an account?</h1>
-            <p className='mb-5 text-center text-lg text-gray-100 '>Welcome back! Sign in to continue organizing and making progress.</p>
+            <h1 className=' text-center text-2xl sm:text-2xl text-gray-100 mb-1 '>Already have an account?</h1>
+            <p className=' text-center text-lg text-gray-100 '>Welcome back! Sign in to continue organizing and making progress.</p>
             <button onClick={handleAnimation} className="bg-blue-500 hover:bg-blue-600 text-gray-100 m-4  py-1.5 px-20 rounded-2xl  text-m">
             Sign in
 </button>
-        <img src='./cat.svg' className=' hover:scale-110 hover:transform-cpu' alt="cat" />  
+        <img src='./cat.svg' className=' hover:scale-110 w-[80%] max-w-[440px] hover:transform-cpu' alt="cat" />  
         </div>
         
         <form className='singinfrom flex flex-col justify-center items-center' onSubmit={handleLogin}>
@@ -113,7 +130,7 @@ export function Login() {
 
         <input type='password' placeholder='Password' className='bg-neutral-300 bg-opacity-70 p-2 px-9 m-2 text-black  rounded-2xl w-72' onChange={(e) => setPassword(e.target.value)}/>
         </div>
-        <button type='submit' className="bg-blue-500 hover:bg-blue-600 text-gray-100 m-4  py-1.5 px-9 rounded-2xl  text-m">
+        <button type='submit' className="bg-blue-500 hover:bg-blue-600 text-gray-100 m-4 sm:mt-5   py-1.5 px-9 rounded-2xl  text-m">
             Sign in
 </button>
 {error && <p className='text-center text-xs  text-red-600'>Oops! It looks like your email or password is incorrect. Please try again.</p>} 
@@ -122,12 +139,12 @@ export function Login() {
       </div>
       <div className='flex flex-col justify-center items-center  justify-self-end'>
       <div className='signupmode flex flex-col justify-center items-center'>
-             <h1 className=' text-center text-2xl text-gray-100 mb-2 '>New to KittyTask??</h1>
-            <p className='mb-5 text-center text-lg text-gray-100 '>Start organizing your life today! Sign up to manage your tasks, projects, and ideas all in one place.</p>
+             <h1 className=' text-center text-2xl sm:text-2xl text-gray-100 mb-1 '>New to KittyTask??</h1>
+            <p className=' text-center text-lg text-gray-100 '>Start organizing your life today! Sign up to manage your tasks, projects, and ideas all in one place.</p>
             <button onClick={handleAnimation} className="bg-blue-500 hover:bg-blue-600 text-gray-100 m-4  py-1.5 px-20 rounded-2xl  text-m">
-            Sign in
+            Sign up
 </button>
-<img src='./cat2.svg' className=' hover:scale-110 hover:transform-cpu' alt="cat" />  
+<img src='./cat2.svg' className=' hover:scale-110 hover:transform-cpu w-[80%] max-w-[440px]' alt="cat" />  
         </div>
      
       <form className='signupfrom flex flex-col  items-center' onSubmit={handleCreateAccount}>
@@ -149,9 +166,9 @@ export function Login() {
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="size-6 absolute top-4 left-4">
   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
 </svg>
-        <input type='password' placeholder='Password' className='bg-neutral-300 bg-opacity-70 p-2 px-9 m-2 text-black  rounded-2xl w-72'   onChange={(e) => setPassword2(e.target.value)}/>
+        <input type='password' placeholder='Password' className='bg-neutral-300 bg-opacity-70 p-2 px-9 m-2 mb-2 text-black  rounded-2xl w-72'   onChange={(e) => setPassword2(e.target.value)}/>
         </div>
-        <button type='submit' className="bg-blue-500 hover:bg-blue-600 text-gray-100 fm-4  py-1.5 px-9 rounded-2xl  text-m">
+        <button type='submit' className="bg-blue-500 hover:bg-blue-600 text-gray-100 fm-4  sm:mt-5  py-1.5 px-9 rounded-2xl  text-m">
             Sign up
 </button>
 {error2 && <p className='text-center text-xs  text-red-600'>{error2}</p>} 
@@ -159,7 +176,7 @@ export function Login() {
    
         </div>
         
-    </div>
+    </div>)}
     </div>
   )
 }

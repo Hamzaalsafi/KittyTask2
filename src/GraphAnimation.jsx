@@ -3,7 +3,7 @@ import React from "react";
 const GraphAnimation = () => {
   return (
     <div className="graph__wrapper">
-      <svg width="220px" viewBox="0 0 315 107" version="1.1" style={{ overflow: "visible" }}>
+      <svg width="80%" viewBox="0 0 315 107" version="1.1" style={{ overflow: "visible" }}>
         <defs>
           {/* Define the path for the text to follow */}
           <path

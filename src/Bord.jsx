@@ -45,6 +45,14 @@ export function Bord() {
         document.removeEventListener('mousedown', handleClickOutsideForShare2);
       };
     }, []);
+    useEffect(() => {
+      // Bind the event listener
+      document.addEventListener('mousedown', handleClickOutsideForShare);
+      return () => {
+        
+        document.removeEventListener('mousedown', handleClickOutsideForShare);
+      };
+    }, []);
   useEffect(() => {
    
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -82,29 +90,32 @@ export function Bord() {
   }, []);
 
 
-   const handleClickOutsideForShare = (event) => {
+  const handleClickOutsideForShare = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsOpen(false);
     }
   };
-  const privateButton=async()=>{
-    if(visibility==="shareable")
-    {
-      setVisibility("private");
-    
- const user = auth.currentUser; 
- if (user) {
-  try {
-    await updateDoc( doc(db, `users/${user.uid}/Boards/${Board.id}`), { boardVisibility: "private" });
-  }
-  catch (error) {
-    console.log("Error updating document: ", error);
-  }
-}
-  } else {
-    console.error('Use.');
-  }
-  }
+  const privateButton = async () => {
+    if (visibility === "shareable") {
+      const user = auth.currentUser; 
+      if (user) {
+        // Check the number of users in the sharedWith array
+        if (sharedWith.length >= 2) {
+          console.error("Cannot change visibility to private: the board is shared with multiple users.");
+          return; // Exit the function if there are 2 or more shared users
+        }
+        
+        try {
+          setVisibility("private");
+          await updateDoc(doc(db, `users/${user.uid}/Boards/${Board.id}`), { boardVisibility: "private" });
+        } catch (error) {
+          console.error("Error updating document: ", error);
+        }
+      } else {
+        console.error("User is not authenticated.");
+      }
+    }
+  };
   const shareableButton=async()=>{
     if(visibility==="private")
     {
@@ -124,14 +135,7 @@ export function Bord() {
   }
   }
     
-  useEffect(() => {
-    // Bind the event listener
-    document.addEventListener('mousedown', handleClickOutsideForShare);
-    return () => {
-      
-      document.removeEventListener('mousedown', handleClickOutsideForShare);
-    };
-  }, []);
+
   const style = Board.background === "" ? {
     backgroundImage: `url('${Board.backgroundImage}')`,
   backgroundSize: "cover",
@@ -195,25 +199,35 @@ export function Bord() {
   
       try {
         const id = new Date().getTime().toString(); 
-        const listDocRef = doc(db, `users/${user.uid}/Boards/${Board.id}/Lists`, id); 
-  
         const newlist = { id: id, title: title };
- 
+  
         setlists((prevLists) => {
           const updatedLists = [...prevLists, newlist];
           
-       
+     
+          const listDocRef = doc(db, `users/${user.uid}/Boards/${Board.id}/Lists`, id);
           setDoc(listDocRef, {
-            title: title,  
+            title: title,
             id: id,
             order: updatedLists.length - 1 
           });
-          
+  
           return updatedLists; 
         });
   
-        console.log('List added successfully');
   
+       console.log(sharedWith)
+        const sharedUpdatePromises = sharedWith.map((sharedUser) => {
+          const sharedListDocRef = doc(db, `users/${sharedUser.id}/Boards/${Board.id}/Lists`, id);
+          return setDoc(sharedListDocRef, {
+            title: title,
+            id: id,
+            order: lists.length 
+          });
+        });
+  
+        await Promise.all(sharedUpdatePromises);
+
         const windowWidth = window.innerWidth;
         if (windowWidth <= 650 && listRefs.current.length > 0) {
           const lastRef = listRefs.current[listRefs.current.length - 1];
@@ -229,6 +243,7 @@ export function Bord() {
       console.error('User is not authenticated');
     }
   };
+  
   const handleClickOutside = (event) => {
     
     if (
@@ -246,7 +261,8 @@ export function Bord() {
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     setIsDragging(false);
-    if (active.id !== over?.id) {
+    
+    if (active.id && over?.id) {
       const user = auth.currentUser;
   
       if (user) {
@@ -259,14 +275,26 @@ export function Bord() {
           try {
             setlists(updatedItems);
   
-            const updatePromises = updatedItems.map((item, index) =>
+        
+            const updateCurrentUserPromises = updatedItems.map((item, index) =>
               updateDoc(doc(db, `users/${user.uid}/Boards/${Board.id}/Lists`, item.id), {
                 order: index,
                 title: item.title,
               })
             );
   
-            await Promise.all(updatePromises);
+            const sharedUpdatePromises = sharedWith.map((sharedUser) => {
+              return updatedItems.map((item, index) =>
+                updateDoc(doc(db, `users/${sharedUser.id}/Boards/${Board.id}/Lists`, item.id), {
+                  order: index,
+                  title: item.title,
+                })
+              );
+            }).flat(); 
+  
+            
+            await Promise.all([...updateCurrentUserPromises, ...sharedUpdatePromises]);
+  
           } catch (error) {
             console.error('Error updating cards:', error);
           }
@@ -276,36 +304,30 @@ export function Bord() {
       }
     }
   };
-  const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor) 
-  );
   
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        delay: 50,
+        tolerance: 5 
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 50,
+        tolerance: 5 
+      },
+    })
+  )
   return (
-   <div style={style} className= {`  h-screen flex flex-col max-h-screen  overflow-x-auto z-0 ${Board.background} `}>
-
-<nav className='bg-gray-400 bg-opacity-55  sm:bg-opacity-50  py-2.5 pl-0.5 pl-3.5 pr-2 sm:pr-5 text-md fixed w-screen items-center top-11'>
-  <div className='flex justify-between  '>
-    <div className='flex gap-5'>
-      <p className='text-white font-bold text-md sm:text-xl cursor-pointer'>{Board.title}</p>
-      <div className="relative inline-block text-left" ref={dropdownRef}>
-      <button
-     
-     onClick={toggleDropdown}
-        className="sm:text-lg text-slate-100 text-md px-1.5 flex gap-1  hover:text-gray-900 rounded-md hover:bg-slate-100 items-center"
-      >
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-    </svg>
-    Workspace visible
-      </button>
-      {isOpen && (
-        <div className=" absolute left-[-10%] top-9  mt-1.5 z-[1000000000] w-72 rounded-2xl  bg-zinc-800   ring-black ring-opacity-5 focus:outline-none">
+   <div style={style} className= {`h-screen max-h-screen overflow-hidden flex flex-col box-border ${Board.background} `}>
+ {isOpen && (
+        <div ref={dropdownRef} className=" absolute top-[5.3em] left-[2.3%]  mt-1.5 shareMenu z-[1000000] w-72 rounded-2xl  bg-zinc-800   ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1" >
             <button onClick={privateButton} style={{
               
               borderColor:visibility==="private"?"lightblue" :""
-            }}  className="block w-full border-2 border-zinc-800 rounded-2xl text-left px-4 py-2 text-sm bg-zinc-800 text-gray-300 hover:bg-zinc-700" >
+            }}  className="block  w-full border-2 border-zinc-800 rounded-2xl text-left px-4 py-2 text-sm bg-zinc-800 text-gray-300 hover:bg-zinc-700" >
               <span className='text-[1.1rem] text-gray-200'>Private Board</span> - A personal board where all tasks and data are private and only visible to you.
             </button>
             <button onClick={shareableButton} style={{
@@ -317,6 +339,22 @@ export function Bord() {
           </div>
         </div>
       )}
+<nav className='bg-gray-400 bg-opacity-55  sm:bg-opacity-50  py-2.5  pl-3.5 pr-2 sm:pr-5 text-md absolute w-screen items-center top-11'>
+  <div className='flex justify-between  '>
+    <div className='flex gap-5'>
+      <p className='text-white font-bold text-md sm:text-xl cursor-pointer'>{Board.title}</p>
+      <div className="relative inline-block text-left" ref={dropdownRef}>
+      <button
+     
+     onClick={()=>{setIsOpen(!isOpen)}}
+        className="sm:text-lg text-slate-100 text-md px-1.5 flex gap-1  hover:text-gray-900 rounded-md hover:bg-slate-100 items-center"
+      >
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+    </svg>
+    Workspace visible
+      </button>
+     
     </div>
 
     </div>
@@ -329,7 +367,7 @@ export function Bord() {
 
 
 {isOpen2&&( <div ref={dropdown2Ref} ><ShareMenu visibility={visibility} id={Board.id} Board={Boards2} BoardMember={sharedWith}/></div>)}
-    <div  ref={BordContainer} className={`ml-6  sm:pl-6 md:ml-0 overflow-x-auto BOARDS  overflow-y-hidden  h-screen over px-3    sm:gap-10 sm:mt-32 flex gap-16 mt-32  ${!isDragging?'BordContainer':" "}`}>
+    <div  ref={BordContainer} className={`ml-7 sm:pl-6 md:ml-0 overflow-x-auto BOARDS  overflow-y-hidden   h-screen max-h-screen over px-3    sm:gap-10  flex gap-16 pt-28  ${!isDragging?'BordContainer':" "}`}>
     <DndContext  onDragStart={handleDragStart} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
     <SortableContext items={lists} strategy={verticalListSortingStrategy}>
      
@@ -338,6 +376,7 @@ export function Bord() {
       <List 
       BoardId={Board.id}
       item={item}
+      sharedWith={sharedWith}
       key={item.id}
       id={item.id}
       Dragging={isDragging}

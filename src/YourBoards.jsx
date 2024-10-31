@@ -53,8 +53,8 @@ export function YourBoards() {
           />
         ))}
        
-       <div onClick={()=>{setCreateBoard(true)}} className=' bg-neutral-700 opacity-90 cursor-pointer hover:opacity-70 border-gray-200 p-5 rounded-sm'>
-    <h2  className='text-gray-400 text-center text-sm '>Create new board</h2>
+       <div onClick={()=>{setCreateBoard(true)}} className=' h-[70px] flex justify-center items-center w-[130px] bg-neutral-700 opacity-90 cursor-pointer hover:opacity-70 border-gray-200 p-5  rounded-sm'>
+    <h2  className='text-zinc-300  text-center text-sm '>Create new board</h2>
   </div>
 </div>
 

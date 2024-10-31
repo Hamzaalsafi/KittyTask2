@@ -6,18 +6,20 @@ body {
     font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
-
+  overflow-y: hidden;
   overflow-x: auto;
 }
 
 
 .main {
     position: relative;
-    max-height: 200px;
+    max-height: 100px;
+    
   }
   
   .main .input {
-    max-width: 165px;
+    
+    max-width: 160px;
     border: none;
     border-bottom: solid gray 1px;
     background: transparent;
@@ -25,12 +27,11 @@ body {
     padding-top: 10px;
     padding-bottom: 10px;
     transition: 0.2s;
-    
     color: #e8e8e8;
     font-size: 1.3rem;
   }
     .button2 {
-    width: 179px;
+    width: 160px;
     border: none;
     border-bottom: solid gray 1px;
     background: transparent;
@@ -39,10 +40,12 @@ body {
     padding: 10px;
     padding-bottom: 10px;
     transition: 0.2s;
-
-    font-size: 1.36rem;
+    font-size: 1.1rem;
   }
-  .main .input:focus,.input:hover ,.main .input:valid ,.button2:hover {
+  .input:focus ,.input:valid{
+    border-color: lightblue;
+  }
+.button2:hover {
     border-color: lightblue;
   }
   Canvas{
@@ -64,8 +67,8 @@ body {
   }
   .main .input:focus + label span , .main .input:valid + label span {
     color: lightblue;
-    top: -28px;
-    opacity: 100%;
+    top: -20px;
+    opacity: 1;
   }
   
   .main .input:focus + label p , .main .input:valid + label p {
@@ -91,17 +94,19 @@ body {
 }
 .graph__wrapper {
     position: absolute;
+    display: flex;
+    
     top:6%;
     left: 43%;
     z-index: 1;
   }
   @media (700px>width) {
     .graph__wrapper {
-        left:0;
-        top:0;
+        left:19%;
+        top:-5%;
       }
       .graph__wrapper svg{
-        width: 220px;
+        width: 65%;
       } 
   }
   .graph__wrapper2 {
@@ -115,8 +120,11 @@ body {
  
   @media (700px>width) {
     .graph__wrapper2 {
-        left: 39%;
+        left:22%;
         top:52%;
+      } 
+      .graph__wrapper2 svg{
+        width: 65%;
       } 
   }
 
@@ -152,24 +160,34 @@ body {
 
 
 
-.NewtonsCradleH1{
-    box-shadow: rgb(234, 32, 136,.4) 0px 5px, rgb(234, 32, 136,.3) 0px 10px, rgb(234, 32, 136,.2) 0px 15px, rgb(234, 32, 136,.15) 0px 20px, rgb(234, 32, 136,.1) 0px 25px;
-    color:#0f172a00;
-}
 
 
-.NewtonsCradleHr {
+
+  .NewtonsCradleHr {
     border: 2px solid rgb(195, 194, 194); 
-   z-index: 100;
-    width: 85%;
+    z-index: 100;
+    width: 65%;
+    min-width: 260px;
+    max-width: 290px;
     position: absolute;
     top: 18.91%;
-    border-radius: 30%;
+    box-shadow: 
+    rgb(234, 32, 136, 0.5) 0px 5px, 
+    rgb(234, 32, 136, 0.3) 0px 10px, 
+    rgb(234, 32, 136, 0.2) 0px 15px, 
+    rgb(234, 32, 136, 0.1) 0px 20px;
+    
+    border-radius: 22%;
+    background-color: transparent; 
 }
+
+
 @media (width>700px) {
     .NewtonsCradleHr{
-      width: 64%;
+      width: 54%;
+      max-width: 500px;
     }
+    
 }
 
 .motivationalQuotes {
@@ -327,14 +345,14 @@ body {
         right:1px;
     }
    .cardinput{
-    z-index:1000;
+ 
     max-width: 220px;
     width: 67%;
  
    }
  
    .BordContainer{
-   
+   overflow-y: hidden;
     
     scroll-snap-type:x mandatory;
    }
@@ -345,11 +363,16 @@ body {
     margin-right: 1.3em;
    }
 }
+
+  .BOARDS, .container {
+    overflow-y: hidden;
+  }
+
 .ListCssCustom{
     max-height: 80vh;
 }
 .kkkk {
-    max-height: 58vh;
+    max-height: 50vh;
     overflow-y: auto;
     margin: 1em auto;
   
@@ -553,18 +576,23 @@ body {
         transition: top 0.5s ease-in-out; 
     }
 }
+.shareMenu{
+  z-index: 1000;
+  
 
+}
 .CARD::before {
     content: "";
     touch-action: none;
     display: block;
     position: relative;
     width:45px;
+    z-index: 1;
     margin-bottom: -1px;
     z-index: -1;
     height:7px;
     border-radius:15px;
-    background-color:#1F2937;
+    background-color:#1f293700;
 }
 #box {
     display: block;

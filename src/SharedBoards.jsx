@@ -19,7 +19,7 @@ export function SharedBoards() {
               data: doc.data(),
               
 
-          })).filter((board) => board.data.boardVisibility === 'shareable');;
+          })).filter((board) => board.data.boardVisibility === 'shareable');
   
           setBoard(BoardsTemp);
         };
