@@ -39,8 +39,8 @@ export function SharedBoards() {
 &#x2715;
 </button>)}
    {!createBoard&&( <div>
-      <h1 className='text-gray-300 mt-2 mb-2  p-1 rounded-md text-xl flex justify-center items-center gap-4'>Shared Boards</h1>
-      <div className='grid grid-cols-2 sm:grid-cols-2 px-0 sm:px-7  md:grid-cols-3 mt-7 mx-4 lg:grid-cols-4 gap-6 overflow-y-auto max-h-[65vh] shadow-sm'>
+    <h1 className='text-gray-300 mt-2 mb-2  p-1 rounded-md text-xl flex justify-center items-center gap-4'>Shared Boards</h1>
+    <div className='grid grid-cols-2 sm:grid-cols-2 px-0 sm:px-7  md:grid-cols-3 mt-7 mx-4 lg:grid-cols-4 gap-6 overflow-y-auto max-h-[65vh] shadow-sm'>
       {
         Board.map((item) => (
           <MiniBoard
@@ -53,8 +53,8 @@ export function SharedBoards() {
           />
         ))}
        
-       <div onClick={()=>{setCreateBoard(true)}} className=' bg-neutral-700 opacity-90 cursor-pointer hover:opacity-70 border-gray-200 p-5 rounded-sm'>
-    <h2  className='text-gray-400 text-center text-sm '>Create new board</h2>
+       <div onClick={()=>{setCreateBoard(true)}} className=' h-[70px] flex justify-center items-center w-[130px] bg-neutral-700 opacity-90 cursor-pointer hover:opacity-70 border-gray-200 p-5  rounded-sm'>
+       <h2  className='text-zinc-300  text-center text-sm '>Create new board</h2>
   </div>
 </div>
 

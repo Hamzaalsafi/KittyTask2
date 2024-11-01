@@ -6,28 +6,25 @@ import { useNavigate  } from 'react-router-dom';
 import { db } from './firebase2';
 export function CreateBoards() {
   const imgBackground=[
-  "./alone-lonely-loneliness-dream-planet-robot-butterflies-3840x2160-6347.jpg",
-  "./alone-surreal-dream-fishes-moon-travel-explorer-3840x2160-1058.jpg",
-  "./astronaut-asteroids-blue-planet-space-travel-no-gravity-3840x2160-2484.jpg",
-  "./astronaut-nasa-flower-garden-butterflies-surreal-moon-3840x2160-3197.jpg",
-  "./astronaut-space-cosmos-planet-rings-of-saturn-orbit-surreal-3840x2160-6739.jpg",
-  "./astronaut-space-station-laptop-sci-fi-space-suit-lights-3840x2160-2478.jpg",
-  "./astronaut-space-travel-gravity-earth-nebula-universe-galaxy-3840x2160-2352.jpg",
-  "./balancing-rocks-3840x2160-16599.jpg",
-  "./couple-lovers-above-clouds-surreal-dream-romantic-together-3840x2160-6250.jpg",
-  "./cozy-cabin-sunset-3840x2160-14443.jpg",
- 
-  "./dolomites-mountains-milky-way-night-starry-sky-dolomite-7000x3937-8361.jpg",
-  "./earth-clouds-surreal-star-trek-digital-composition-3840x2160-6075.jpg",
-  "./full-moon-landscape-3840x2160-13385.jpg",
-  "./gta-6-teaser-3840x2160-13559.png",
-  "./hot-air-balloon-night-full-moon-dark-background-sea-stars-3840x2160-2409.jpg",
-  "./lakeside-sunset-deer-minimal-art-landscape-scenic-panorama-3840x2160-4592.png",
-  "./lighthouse-sunset-dusk-twilight-seascape-scenic-ocean-5k-3840x2160-451.jpg",
-  "./moon-night-seascape-sailing-boat-blue-minimal-5k-8k-3840x2160-4522.jpg",
-  "./night-man-alone-starry-sky-night-sky-comet-silhouette-3840x2160-8325.jpg",
-
-  "./sun-valley-purple-sky-cracked-daytime-surreal-scenery-5k-3840x2160-3280.jpg"
+  "./BoardBackground/1.jpg",
+  "./BoardBackground/2.jpg",
+  "./BoardBackground/3.jpg",
+  "./BoardBackground/4.jpg",
+  "./BoardBackground/5.jpg",
+  "./BoardBackground/6.jpg",
+  "./BoardBackground/7.jpg",
+  "./BoardBackground/8.jpg",
+  "./BoardBackground/9.jpg",
+  "./BoardBackground/10.jpg",
+  "./BoardBackground/11.jpg",
+  "./BoardBackground/12.jpg",
+  "./BoardBackground/13.jpg",
+  "./BoardBackground/14.jpg",
+  "./BoardBackground/15.jpg",
+  "./BoardBackground/16.jpg",
+  "./BoardBackground/17.jpg",
+  "./BoardBackground/18.png",
+  "./BoardBackground/19.jpg",
   ]
   const navigate = useNavigate();
 
@@ -194,7 +191,7 @@ const handleTitle=(e)=>{
     </div >
     <div className=' self-center '>
       <h1 className='text-xl mt-4 mb-1 opacity-90 text-gray-300  text-center'>Background</h1>
-      <div className='color max-h-[20vh] sm:max-h-[155px] mb-4 rounded-md px-3 overflow-y-auto container bg-neutral-800'>
+      <div className='color max-h-[20vh] sm:max-h-[17vh] mb-4 rounded-md px-3 overflow-y-auto  bg-neutral-800'>
       <div className='grid grid-cols-3 sm:grid-cols-2  mt-1 md:grid-cols-3 p-1  lg:grid-cols-4 gap-5'>
 
       <div onClick={()=>{setBackground("bg-gradient-to-r from-teal-400 to-blue-500"); if(failed==="Make sure you choose a background and images"){setFailed("")}}} className='cursor-pointer bg-gradient-to-r from-teal-400 to-blue-500 py-6 sm:py-7  rounded-sm'>
@@ -234,7 +231,7 @@ const handleTitle=(e)=>{
   </div>
     </div>
  </div>
- <div className='color max-h-[20vh]  sm:max-h-[155px]  rounded-md sm:px-3 px-2 overflow-y-auto container bg-neutral-800'>
+ <div className='color max-h-[20vh]  sm:max-h-[17vh]  rounded-md sm:px-3 px-2 overflow-y-scroll  bg-neutral-800'>
       <div className='grid grid-cols-3 sm:grid-cols-2  mt-1 md:grid-cols-3 p-1  lg:grid-cols-4 gap-5'>
      
   {

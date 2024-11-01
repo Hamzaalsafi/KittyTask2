@@ -584,7 +584,7 @@ Delete
       <div>
     <textarea
           ref={cardinputRef}
-            className={`z-[1000]  absolute sm:w-full w-[70%] left-0  sm:right-0 top-0 pb-2 pt-3 ri text-start px-2.5 rounded-md  border-solid border-slate-400 border-0 focus:outline-none  text-slate-300 resize-none overflow-hidden ${background?background:"bg-gray-800"}`}
+            className={`z-[99]  absolute sm:w-full w-[70%] left-0  sm:right-0 top-0 pb-2 pt-3 ri text-start px-2.5 rounded-md  border-solid border-slate-400 border-0 focus:outline-none  text-slate-300 resize-none overflow-hidden ${background?background:"bg-gray-800"}`}
           onChange={cardInputUpdate}
             rows='1'
             value={cardTitle}
@@ -610,14 +610,14 @@ Delete
   />
 </svg></div>
    <div className='flex flex-wrap gap-2'>
-      {cardLable.label1&&(<span className='z-[1000]  bg-green-600 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label2&&(<span className='z-[1000] bg-yellow-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label3&&(<span className='z-[1000] bg-amber-600  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label4&&(<span className='z-[1000] bg-red-700  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label5&&(<span className='z-[1000]  bg-indigo-700 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label6&&( <span className='z-[1000]  bg-blue-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label7&&( <span className='z-[1000]  bg-pink-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label8&&( <span className='z-[1000]  bg-neutral-400  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label1&&(<span className='z-[100]  bg-green-600 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label2&&(<span className='z-[100] bg-yellow-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label3&&(<span className='z-[100] bg-amber-600  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label4&&(<span className='z-[100] bg-red-700  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label5&&(<span className='z-[100]  bg-indigo-700 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label6&&( <span className='z-[100]  bg-blue-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label7&&( <span className='z-[100]  bg-pink-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label8&&( <span className='z-[100]  bg-neutral-400  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
   </div>
   {cardTitle ? cardTitle : "Empty Card"}
 </div>

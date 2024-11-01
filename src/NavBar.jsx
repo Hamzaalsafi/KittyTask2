@@ -92,7 +92,7 @@ export function NavBar() {
                 justifyContent: 'center',
                 fontWeight: 'bold',
                 fontSize: '20px',
-                border: '1.5px solid #555'
+                border: '0 solid #555'
               }}
             >
               {avatarInitials.toUpperCase()}
