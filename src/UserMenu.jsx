@@ -1,6 +1,21 @@
 import React from 'react'
-
+import { useNavigate } from 'react-router-dom';
+import {signOut } from 'firebase/auth';
+import { auth } from './firebase2';
 export function UserMenu({avatarColor, avatarIn,userEmail,userName}) {
+  const navigate = useNavigate();
+    const handleLogout = async () => {
+ 
+      try {
+        await signOut(auth);  
+        navigate('/');    
+      } catch (error) {
+        console.error('Error logging out:', error);
+      }
+    };
+  const handleSignIn=()=>{
+    navigate('/');
+  }
   return (
     <div style={{backgroundColor:"#37393C"}} className='h-fit  gap-2 flex flex-col w-64 text-gray-300   py-4  shadow-xl  fixed z-[10000] rounded-md top-12 right-1'>
        <p className='text-sm mb-2 px-5'>ACCOUNT</p>
@@ -63,9 +78,9 @@ export function UserMenu({avatarColor, avatarIn,userEmail,userName}) {
 <hr className='border-0 border-b w-[95%]  opacity-25 ' />
 </div>
 {userName!=="Guest"&&(<div className='flex items-center cursor-pointer px-5 py-1.5 hover:bg-zinc-800  w-full justify-between'>
-<p className='text-[.9rem]'>Log out</p></div>)}
+<p onClick={handleLogout} className='text-[.9rem]'>Log out</p></div>)}
 {userName==="Guest"&&(<div className='flex items-center cursor-pointer px-5 py-1.5 hover:bg-zinc-800  w-full justify-between'>
-    <p className='text-[.9rem]'>Log in</p></div>)}
+    <p onClick={handleSignIn} className='text-[.9rem]'>Sign in</p></div>)}
         </div>
    
   )

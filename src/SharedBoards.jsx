@@ -14,27 +14,20 @@ export function SharedBoards() {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         const fetchCards = async () => {
-          setLoading(true); 
+          setLoading(true);
+          const BoardRef = collection(db,`users/${user.uid}/Boards`);
+          const snapshot = await getDocs(BoardRef);
+          const BoardsTemp = snapshot.docs.map((doc) => ({
+            id: doc.id,
+              data: doc.data(),
+              
+
+          })).filter((board) => board.data.boardVisibility === 'shareable');
   
-          try {
-            const BoardRef = collection(db, `users/${user.uid}/Boards`);
-            const snapshot = await getDocs(BoardRef);
-            const BoardsTemp = snapshot.docs
-              .map((doc) => ({
-                id: doc.id,
-                data: doc.data(),
-              }))
-              .filter((board) => board.data.boardVisibility === 'shareable');
-  
-            setBoard(BoardsTemp);
-          } catch (error) {
-            console.error('Error fetching lists:', error);
-          } finally {
-            setLoading(false); 
-          }
+          setBoard(BoardsTemp);
         };
   
-        fetchCards();
+        fetchCards().catch((error) => console.error('Error fetching lists:', error));
       } else {
         setBoard([]);
       }
@@ -45,13 +38,12 @@ export function SharedBoards() {
   const [createBoard,setCreateBoard]=useState(false);
   return (
   <div>
-    <div>
 {( createBoard&&<button onClick={()=>{setCreateBoard(false)}} className="  absolute  text-slate-300  py-1 px-2 left-[90%] sm:left-[70%] sm:top-[-5%] top-[-10%] rounded-xl    text-2xl hover:bg-zinc-900">
 &#x2715;
 </button>)}
    {!createBoard&&( <div>
     <h1 className='text-gray-300 mt-2 mb-2  p-1 rounded-md text-xl flex justify-center items-center gap-4'>Shared Boards</h1>
-    <div className='grid grid-cols-2 sm:grid-cols-2 px-0 sm:px-7  md:grid-cols-3 mt-7 mx-4 lg:grid-cols-4 gap-6 overflow-y-auto max-h-[65vh] shadow-sm'>
+    <div className='grid grid-cols-2 sm:grid-cols-2 px-0 sm:px-7  md:grid-cols-3 mt-7 mx-4 lg:grid-cols-4 gap-6 max-h-[62vh] shadow-sm'>
       {
         Board.map((item) => (
           <MiniBoard
@@ -71,7 +63,6 @@ export function SharedBoards() {
 
     </div>)}
     {createBoard&&(<CreateBoards/>)}
-  </div>
   </div>
   )
 }

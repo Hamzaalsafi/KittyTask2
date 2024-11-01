@@ -1,12 +1,12 @@
 
 import { useState,useEffect,useRef} from 'react';
-import { doc, updateDoc,deleteDoc } from "firebase/firestore"; 
+import { doc, updateDoc,deleteDoc,setDoc ,collection,getDocs} from "firebase/firestore"; 
 import { db } from './firebase2'; 
 import { auth } from './firebase2';
 import { useSortable } from '@dnd-kit/sortable';
 
 import { useMenuContext } from './MenuProvider';
-export function Card({title,id,listid,labels,item,BoardId,onDeleteCard,BG ,sharedWith}) {
+export function Card({title,id,listid,labels,item,BoardId,onDeleteCard,BG ,sharedWith,lists}) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const { menuOpen, setMenuOpen, toggleMenu } = useMenuContext();
   const [position2, setPosition2] = useState({ x: 0, y: 0 });
@@ -17,8 +17,11 @@ const labelmenuRef=useRef(null)
   const menuRef=useRef(null);
   const backref=useRef(null);
   const cardRef=useRef(null);
+  const moveMenuRef=useRef(null);
+  const moveRef=useRef(null);
   const label=useRef(null);
   const [backgroundMenu, setBackgroundMenu] = useState(false);
+  const [moveMenu, setMoveMenu] = useState(false);
   const backgroundMenuRef = useRef(null);
   const [menuflexend,setmenuflexend]=useState(false);
   const [menuForphone,setmenuForphone]=useState(false);
@@ -182,6 +185,34 @@ const labelmenuRef=useRef(null)
       console.error("User is not authenticated");
     }
   };
+  const moveCardTo=async(list)=>{
+    const user = auth.currentUser;
+    if(user){
+      try{
+        const cardsCollectionRef = collection(db, `users/${user.uid}/Boards/${BoardId}/Lists/${list.id}/cards`);
+    const snapshot = await getDocs(cardsCollectionRef);
+    const count = snapshot.size;
+
+        const cardDocRef = doc(db, `users/${user.uid}/Boards/${BoardId}/Lists/${list.id}/cards`,id);
+        await setDoc(cardDocRef, {
+          id: id,
+          title: cardTitle,
+          labels: cardLable,
+          background: background,
+          order: count,
+         
+        });
+        deletecard();
+        window.location.reload()
+      }catch(e){
+        console.error("Error moving card to list: ", e);
+      }
+    }
+    else{
+      console.error("User is not authenticated");
+    }
+
+  }
   const cardInputUpdate = async (e) => {
     const newTitle = e.target.value; 
     setcardTitle(newTitle);
@@ -237,14 +268,26 @@ const labelmenuRef=useRef(null)
   
     
   }
+  const moveMenuToList=()=>{
+    setMoveMenu(true);
+
+    const rect = moveRef.current.getBoundingClientRect();
+    setPosition2({
+      x: rect.left, 
+      y:rect.top 
+    });
+  
+    
+  }
   useEffect(() => {
    const handleClickOutside = (event) => {
-    // Check if click is outside the main menu and card input
+
     if (menuRef.current && !menuRef.current.contains(event.target) && !cardinputRef.current.contains(event.target)) {
-        // Check if click is outside both label menu and background menu
+
         if (
             (!labelmenuRef.current || !labelmenuRef.current.contains(event.target)) &&
-            (!backgroundMenuRef.current || !backgroundMenuRef.current.contains(event.target))
+            (!backgroundMenuRef.current || !backgroundMenuRef.current.contains(event.target))&&
+            (!moveMenuRef.current || !moveMenuRef.current.contains(event.target))
         ) {
             setmenu(false);
             setMenuOpen(false);
@@ -252,15 +295,17 @@ const labelmenuRef=useRef(null)
         }
     }
 
-    // Check if click is outside the label menu
+  
     if (labelmenuRef.current && !labelmenuRef.current.contains(event.target) && !label.current.contains(event.target)) {
         setlablemenu(false);
     }
 
-    // Check if click is outside the background menu
     if (backgroundMenuRef.current && !backgroundMenuRef.current.contains(event.target) && !backref.current.contains(event.target)) {
-        setBackgroundMenu(false); // Close background menu when clicked outside
+        setBackgroundMenu(false);
     }
+    if (moveMenuRef.current && !moveMenuRef.current.contains(event.target) && !moveRef.current.contains(event.target)) {
+      setMoveMenu(false); 
+  }
 };
 
 // Add the event listener
@@ -321,6 +366,40 @@ return () => {
           </div>
         </div>
       )}
+        {moveMenu&&(<div
+          style={{
+            top: window.innerHeight > position2.y + 350 ? `${position2.y}px` : `${position2.y - 170}px`,
+            left: !menuForphone ? `${position2.x - 70}px` : '52%',
+            maxWidth: menuForphone ? '170px' : " ",
+          }}
+         ref={moveMenuRef}
+          className='flex absolute flex-col z-[10001] w-[200px]  rounded-md text-gray-300 pt-2 bg-gray-800 gap-1.5'
+        >
+        
+          <div className='flex justify-end align-top'>
+            <button
+             onClick={(event) => {
+              event.stopPropagation();
+              setMoveMenu(false);
+            }}
+              className="m-1 text-slate-300 px-1 rounded-md text-sm hover:bg-gray-600"
+            >
+              &#x2715;
+            </button>
+          </div>
+          <div className='flex justify-center gap-6'>
+            <h3 className='mb-3 -mt-[1.9rem] text-center'>To List</h3>
+          </div>
+          <div className='flex flex-col gap-1'>
+          {lists.map((item,index)=>(
+            <div  key={index}   onClick={() => moveCardTo(item)} className='flex py-1 justify-start ga-1 text-gray-300 hover:bg-gray-700  px-4'>
+              <p className='text-lg'>{index+1}</p>
+              <p className='text-lg'>. {item.title}</p>
+             
+            </div>
+          ))}
+          </div>
+          </div>)}
         {lablemenu&&( <div
         style={{
      
@@ -534,7 +613,7 @@ Change cover
 </svg>
 Change dates
  </button>
- <button className="flex text-gray-300 shadow-xl  bg-gray-800  hover:bg-gray-700  font-bold rounded-sm p-3 pr-3.5  w-fit py-2.5  text-sm">
+ <button ref={moveRef} onClick={moveMenuToList} className="flex text-gray-300 shadow-xl  bg-gray-800  hover:bg-gray-700  font-bold rounded-sm p-3 pr-3.5  w-fit py-2.5  text-sm">
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2">
   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
 </svg>

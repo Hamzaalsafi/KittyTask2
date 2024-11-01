@@ -9,7 +9,7 @@ import { useLocation } from 'react-router-dom';
 import { db } from './firebase2';
 import {ShareMenu} from './ShareMenu'
 import { DndContext,TouchSensor, closestCenter, useSensor, useSensors, MouseSensor } from '@dnd-kit/core';
-
+import { ThreeDot } from 'react-loading-indicators';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 export function Bord() {
   const BordContainer=useRef(null);
@@ -23,13 +23,18 @@ export function Bord() {
   const [lists, setlists] = useState([]);
   const location=useLocation();
   const Board=location.state;
+  const [loading, setLoading] = useState(true);
   const [Boards2,setBoards2]=useState(Board);
   const [visibility, setVisibility] = useState(Board.boardVisibility);
   const [sharedWith,setsharedWith]=useState(Board.sharedWith);
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-  
+
+  useEffect(()=>{
+    const timer=setTimeout(()=>{
+      setLoading(false)
+    },700);
+ 
+    return()=>{clearTimeout(timer);}
+  }),[]
   const [isOpen2, setIsOpen2] = useState(false);
   const dropdown2Ref = useRef(null);
   const handleClickOutsideForShare2 = (event) => {
@@ -320,7 +325,16 @@ export function Bord() {
     })
   )
   return (
-   <div style={style} className= {`h-screen max-h-screen overflow-hidden flex flex-col box-border ${Board.background} `}>
+    <div>
+       {loading && (
+  <div className='flex h-screen w-screen flex-col justify-center items-center gap-6 p-4 '>
+    <ThreeDot variant="bounce" color="#d33dad" size="large" text="" textColor="#f8f8f8" />
+    <p className='text-[1.3rem] font-bold text-center text-gray-900' style={{ maxWidth: '350px' }}>
+      Hang tight! We're preparing everything for you...
+    </p>
+  </div>
+)}
+   {!loading&&(<div style={style} className= {`h-screen max-h-screen overflow-hidden flex flex-col box-border ${Board.background} `}>
  {isOpen && (
         <div ref={dropdownRef} className=" absolute top-[5.3em] left-[2.3%]  mt-1.5 shareMenu z-[1000000] w-72 rounded-2xl  bg-zinc-800   ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1" >
@@ -378,6 +392,7 @@ export function Bord() {
       item={item}
       sharedWith={sharedWith}
       key={item.id}
+      lists={lists}
       id={item.id}
       Dragging={isDragging}
       ref={(el) => (listRefs.current[index] = el)}
@@ -407,6 +422,7 @@ export function Bord() {
      
     </div>
 
+  </div>)}
   </div>
   );
 }

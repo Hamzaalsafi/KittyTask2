@@ -10,7 +10,7 @@ import { useMenuContext } from './MenuProvider';
 import { useSortable } from '@dnd-kit/sortable';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 
-export const List = forwardRef(({item,Dragging, title, id,BoardId ,sharedWith}, ref) => {
+export const List = forwardRef(({item,Dragging, title,lists, id,BoardId ,sharedWith}, ref) => {
   const [createCard, setCreateCard] = useState(false);
   const AddingListRef = useRef(null);
   const [cardTitle, setCardTitle] = useState('');
@@ -362,6 +362,7 @@ const handleMouseDown = (event) => {
                 item={item}
                 onDeleteCard={handleCardDeletion}
                 sharedWith={sharedWith}
+                lists={lists}
               />
             ))}
           </SortableContext>

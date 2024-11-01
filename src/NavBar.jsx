@@ -2,12 +2,14 @@ import { useState, useEffect,useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from './firebase2';
-import { onAuthStateChanged } from 'firebase/auth';
+import {onAuthStateChanged} from "firebase/auth";
 import { CatLogo } from './CatLogo';
 import { UserMenu } from './UserMenu';
 
+
 export function NavBar() {
   const dropdownRef = useRef(null);
+ 
   const [userInformation, setUserInformation] = useState({});
   const [isOpen, setIsOpen] = useState(false);
   const handleClickOutsideForUserDetails = (event) => {
@@ -76,8 +78,7 @@ export function NavBar() {
                 KittyTask
               </div>
             </Link> 
-            <p className='text-zinc-50 cursor-pointer'>Boards</p>
-            <p className='text-zinc-50 cursor-pointer'>Settings</p>
+           
           </div>
           <div onClick={()=>{setIsOpen(!isOpen)}} className='flex mr-2 justify-center items-center hover:opacity-85 cursor-pointer'> 
             <div className='select-none mb-1 border-2'
