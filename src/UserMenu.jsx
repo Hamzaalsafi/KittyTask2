@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import {signOut } from 'firebase/auth';
 import { auth } from './firebase2';
+import { Link } from 'react-router-dom';
 export function UserMenu({avatarColor, avatarIn,userEmail,userName}) {
   const navigate = useNavigate();
     const handleLogout = async () => {
@@ -46,34 +47,14 @@ export function UserMenu({avatarColor, avatarIn,userEmail,userName}) {
                
           
         </div>
-       <div className='flex items-center cursor-pointer px-5 py-2 hover:bg-zinc-800  w-full justify-between'>
-  <p className='text-[.9rem]'>Manage account</p>
-  <div className='flex items-center'>   
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
-      className="size-5"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-      />
-    </svg>
-  </div>
-</div>
+      
 <div className='flex justify-center'>
 <hr className='border-0 border-b w-[95%]  opacity-25 ' />
 </div>
+<Link to='CardsArchive'>
 <div className='flex items-center cursor-pointer px-5 py-1.5 hover:bg-zinc-800  w-full justify-between'>
-<p className='text-[.9rem]'>Cards Archive</p></div>
-<div className='flex items-center cursor-pointer px-5 py-1.5 hover:bg-zinc-800  w-full justify-between'>
-<p className='text-[.9rem]'>Settings</p></div>
-<div className='flex items-center cursor-pointer px-5 py-1.5 hover:bg-zinc-800  w-full justify-between'>
-<p className='text-[.9rem]'>Theme</p></div>
+<p className='text-[.9rem]'>Cards Archive</p></div></Link>
+
 <div className='flex justify-center'>
 <hr className='border-0 border-b w-[95%]  opacity-25 ' />
 </div>

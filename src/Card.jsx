@@ -27,7 +27,7 @@ const labelmenuRef=useRef(null)
   const [menuForphone,setmenuForphone]=useState(false);
   const [cardTitle,setcardTitle]=useState(title);
   const cardinputRef=useRef(null);
-
+  const [copyButton,setCopyButton]=useState(false);
   const [background,setBackground]=useState(BG);
 
   const getColorClass=(backgroundOption)=> {
@@ -185,38 +185,69 @@ const labelmenuRef=useRef(null)
       console.error("User is not authenticated");
     }
   };
-  const moveCardTo=async(list)=>{
+  const copyToClipboard = () => {
     const user = auth.currentUser;
-    if(user){
-      try{
+    const textarea = document.createElement('textarea');
+    textarea.value = `users/${user.uid}/Boards/${BoardId}/Lists/${listid}/cards/${id}`; 
+    document.body.appendChild(textarea); 
+    textarea.select(); 
+    document.execCommand('copy'); 
+    document.body.removeChild(textarea); 
+    setCopyButton(true);
+    setTimeout(() => {
+      setCopyButton(false);
+  }, 1500);
+ 
+};
+  const moveCardTo = async (list) => {
+    const user = auth.currentUser;
+  
+    if (user) {
+      try {
         const cardsCollectionRef = collection(db, `users/${user.uid}/Boards/${BoardId}/Lists/${list.id}/cards`);
-    const snapshot = await getDocs(cardsCollectionRef);
-    const count = snapshot.size;
-
-        const cardDocRef = doc(db, `users/${user.uid}/Boards/${BoardId}/Lists/${list.id}/cards`,id);
+        const snapshot = await getDocs(cardsCollectionRef);
+        const count = snapshot.size;
+  
+        // Create a reference to the new card document for the user
+        const cardDocRef = doc(db, `users/${user.uid}/Boards/${BoardId}/Lists/${list.id}/cards`, id);
         await setDoc(cardDocRef, {
           id: id,
           title: cardTitle,
           labels: cardLable,
           background: background,
           order: count,
-         
         });
-        deletecard();
-        window.location.reload()
-      }catch(e){
+  
+       
+        const sharedAddPromises = sharedWith.map((sharedUser) => {
+          const sharedListDocRef = doc(db, `users/${sharedUser.id}/Boards/${BoardId}/Lists/${list.id}/cards`, id);
+          return setDoc(sharedListDocRef, {
+            id: id,
+            title: cardTitle,
+            labels: cardLable,
+            background: background,
+            order: count,
+          });
+        });
+  
+        await Promise.all(sharedAddPromises);
+  
+
+        await deletecard();  
+
+        window.location.reload();
+      } catch (e) {
         console.error("Error moving card to list: ", e);
       }
-    }
-    else{
+    } else {
       console.error("User is not authenticated");
     }
-
-  }
+  };
+  
   const cardInputUpdate = async (e) => {
     const newTitle = e.target.value; 
     setcardTitle(newTitle);
-    console.log(sharedWith);
+    
     const user = auth.currentUser; 
     if (user) {
       try {
@@ -577,60 +608,53 @@ return () => {
       
     </div>)}
        <div className={`overlay ${menu ? 'visible' : ''}`}></div>
-       {menu&&(<div ref={menuRef}  className='card flex item  z-[1001]  absolute  flex-col gap-1 '  style={{
+       {menu&&(<div ref={menuRef}  className='card flex item  z-[1001]  absolute  flex-col gap-[2.5px] '  style={{
 
-            top:window.innerHeight>position.y+350? `${position.y}px`:`${position.y-180}px`,
-            left:!menuForphone? `${position.x}px`:'52.5%',
+            top:window.innerHeight>position.y+350? `${position.y+7}px`:`${position.y-180}px`,
+            left:!menuForphone? `${position.x+10}px`:'52.5%',
             alignItems: `${(menuflexend)? 'end' : 'start'
 
             }`
           }}>
-      <button className="flex text-gray-300 shadow-xl bg-gray-800  hover:bg-gray-700 rounded-sm font-bold   p-3 pr-3.5 py-2 w-fit  text-sm"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-</svg>
-
-Open card</button>
+     
 <button ref={label} onClick={Lablemenu} className="flex text-gray-300 shadow-xl bg-gray-800 hover:bg-gray-700 rounded-sm font-bold p-3 pr-3.5 py-2.5 w-fit  text-sm"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2">
   <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
   <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
 </svg>
 Edit labels </button>
-<button className="flex text-gray-300 shadow-xl bg-gray-800  hover:bg-gray-700 rounded-sm font-bold p-3 pr-3.5  w-fit py-2.5  text-sm">
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-</svg>
-Change members
- </button>
  <button ref={backref} onClick={backgroundmenu} className="flex text-gray-300 shadow-xl bg-gray-800  hover:bg-gray-700  font-bold rounded-sm p-3 pr-3.5  w-fit py-2.5  text-sm">
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2">
   <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25 1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 1 0-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94.19-1.28.53l-.97.97-.75-.75.97-.97c.34-.34.53-.8.53-1.28s.19-.94.53-1.28L12.75 9M15 11.25 12.75 9" />
 </svg>
 Change cover
  </button>
- <button className="flex text-gray-300 shadow-xl bg-gray-800  hover:bg-gray-700  font-bold rounded-sm p-3 pr-3.5  w-fit py-2.5  text-sm">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-</svg>
-Change dates
- </button>
+
  <button ref={moveRef} onClick={moveMenuToList} className="flex text-gray-300 shadow-xl  bg-gray-800  hover:bg-gray-700  font-bold rounded-sm p-3 pr-3.5  w-fit py-2.5  text-sm">
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2">
   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
 </svg>
 Move
  </button>
- <button className="flex text-gray-300 shadow-xl bg-gray-800  hover:bg-gray-700 font-bold  rounded-sm p-3 pr-3.5  w-fit py-2.5  text-sm">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2">
+ <button onClick={copyToClipboard} className={`flex text-gray-300 shadow-xl ${copyButton?"bg-green-600":"bg-gray-800"}  ${copyButton?"hover:bg-green-700":"hover:bg-gray-700"}  font-bold  rounded-sm p-3 pr-3.5  w-fit py-2.5  text-sm`}>
+{copyButton? <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth="1.5"
+        stroke="currentColor"
+       className="size-5 mr-2"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"
+        />
+    </svg>:(<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2">
   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
-</svg>
-Copy
+</svg>)}
+{copyButton?"Copied!":"Copy"}
  </button>
- <button className="flex text-gray-300 shadow-xl bg-gray-800  hover:bg-gray-700 font-bold  rounded-sm p-3 pr-3.5  w-fit py-2.5  text-sm">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-2">
-  <path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-</svg>
-Archive
- </button>
+
  <button onClick={deletecard} className="flex text-gray-300  bg-gray-800  hover:bg-gray-700 font-bold  rounded-sm p-3 pr-3.5  w-fit py-2.5  text-sm">
  <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -663,7 +687,7 @@ Delete
       <div>
     <textarea
           ref={cardinputRef}
-            className={`z-[99]  absolute sm:w-full w-[70%] left-0  sm:right-0 top-0 pb-2 pt-3 ri text-start px-2.5 rounded-md  border-solid border-slate-400 border-0 focus:outline-none  text-slate-300 resize-none overflow-hidden ${background?background:"bg-gray-800"}`}
+            className={`z-[1000]  absolute sm:w-full w-[70%] left-0  sm:right-0 top-0 pb-2 pt-3 ri text-start px-2.5 rounded-md  border-solid border-slate-400 border-0 focus:outline-none  text-slate-300 resize-none overflow-hidden ${background?background:"bg-gray-800"}`}
           onChange={cardInputUpdate}
             rows='1'
             value={cardTitle}
@@ -689,14 +713,14 @@ Delete
   />
 </svg></div>
    <div className='flex flex-wrap gap-2'>
-      {cardLable.label1&&(<span className='z-[100]  bg-green-600 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label2&&(<span className='z-[100] bg-yellow-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label3&&(<span className='z-[100] bg-amber-600  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label4&&(<span className='z-[100] bg-red-700  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label5&&(<span className='z-[100]  bg-indigo-700 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label6&&( <span className='z-[100]  bg-blue-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label7&&( <span className='z-[100]  bg-pink-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
-      {cardLable.label8&&( <span className='z-[100]  bg-neutral-400  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label1&&(<span className='z-[1001]  bg-green-600 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label2&&(<span className='z-[1001] bg-yellow-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label3&&(<span className='z-[1001] bg-amber-600  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label4&&(<span className='z-[1001] bg-red-700  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label5&&(<span className='z-[1001]  bg-indigo-700 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label6&&( <span className='z-[1001]  bg-blue-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label7&&( <span className='z-[1001]  bg-pink-800 w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
+      {cardLable.label8&&( <span className='z-[1001]  bg-neutral-400  w-11 rounded-2xl h-[.45rem] -ml-0.5 mb-0.5 -mt-1.5' ></span>)}
   </div>
   {cardTitle ? cardTitle : "Empty Card"}
 </div>

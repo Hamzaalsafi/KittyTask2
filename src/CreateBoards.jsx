@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { auth } from './firebase2'; 
 import { doc, setDoc,getDoc } from 'firebase/firestore';
 import { useNavigate  } from 'react-router-dom';
+import { useInView } from 'react-intersection-observer';
 import { db } from './firebase2';
 export function CreateBoards() {
   const imgBackground=[
@@ -234,22 +235,34 @@ const handleTitle=(e)=>{
  <div className='color max-h-[20vh]  sm:max-h-[17vh]  rounded-md sm:px-3 px-2 overflow-y-scroll  bg-neutral-800'>
       <div className='grid grid-cols-3 sm:grid-cols-2  mt-1 md:grid-cols-3 p-1  lg:grid-cols-4 gap-5'>
      
-  {
-    imgBackground.map((img)=>(
-      <div style={{
-        backgroundImage: `url('${img}')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        color: "rgba(255,255,255,0)",
-      }} 
-      key={img}
-   
-      onClick={()=>{setBackground(""); setImages(img); if(failed==="Make sure you choose a background and images"){setFailed("")}}}
-       className ='border-gray-100 cursor-pointer text-opacity-0  bg-black p-4 py-3 sm:py-4 px-5 sm:px-6 select-none  rounded-sm'>
-        Board
-      </div>
-    ))
-  }
+      {imgBackground.map((img) => {
+        const { ref, inView } = useInView({
+          threshold: 0.1, // Adjust this threshold as needed
+        });
+
+        return (
+          <div
+            ref={ref}
+            style={{
+              backgroundImage: inView ? `url('${img}')` : 'none', // Load image only when in view
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              color: "rgba(255,255,255,0)",
+            }}
+            key={img}
+            onClick={() => {
+              setBackground("");
+              setImages(img);
+              if (failed === "Make sure you choose a background and images") {
+                setFailed("");
+              }
+            }}
+            className='border-gray-100 cursor-pointer text-opacity-0 bg-black p-4 py-3 sm:py-4 px-5 sm:px-6 select-none rounded-sm'
+          >
+            Board
+          </div>
+        );
+      })}
     </div>
 
  </div>

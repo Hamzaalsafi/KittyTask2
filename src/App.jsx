@@ -5,7 +5,7 @@ import { Bord } from './Bord';
 import { Home } from './Home';
 import { NavBar } from './NavBar';
 import { Login } from './Login';
-
+import {CardsArchive} from './CardsArchive';
 function App() {
   return (
     <Router>
@@ -22,6 +22,7 @@ function Main() {
     <div className="app">
       {location.pathname !== Loginctl && <NavBar />}
       <Routes>
+        <Route path="/CardsArchive" element={<CardsArchive/>} />
         <Route path="/Home" element={<Home/>} />
         <Route path="/" element={<Login />} />
         <Route path="/Board/:id" element={<Bord />} />

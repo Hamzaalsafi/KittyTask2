@@ -19,25 +19,25 @@ export function Login() {
     const handleLogin = async (e) => {
       e.preventDefault();
       setError('');
-      setLoading(true); // Set loading to true at the start
+      setLoading(true); 
   
       if (!email || !password) {
           setError('Please fill in both email and password.');
-          setLoading(false); // Stop loading if validation fails
+          setLoading(false); 
           return;
       }
   
       try {
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
           
-          // Optionally, handle userCredential if needed
+    
           
           navigate('/Home'); 
       } catch (error) {
           console.error('Login error:', error);
           setError('Error logging in: ' + error.message);
       } finally {
-          setLoading(false); // Stop loading when finished
+          setLoading(false); 
       }
   };
   const getColorFromName = (name) => {

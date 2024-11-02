@@ -6,7 +6,6 @@ import {onAuthStateChanged} from "firebase/auth";
 import { CatLogo } from './CatLogo';
 import { UserMenu } from './UserMenu';
 
-
 export function NavBar() {
   const dropdownRef = useRef(null);
  
