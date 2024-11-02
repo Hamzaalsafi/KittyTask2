@@ -237,7 +237,7 @@ const handleTitle=(e)=>{
      
       {imgBackground.map((img) => {
         const { ref, inView } = useInView({
-          threshold: 0.1, // Adjust this threshold as needed
+          threshold: 0.1, 
         });
 
         return (

@@ -287,7 +287,7 @@ const handleMouseDown = (event) => {
             { title: newTitle }
           )
         );
-        
+        console.log("asdf")
         await Promise.all(sharedTitleUpdatePromises);
   
       } catch (error) {

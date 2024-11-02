@@ -11,7 +11,7 @@ import {ShareMenu} from './ShareMenu'
 import { motion, AnimatePresence } from 'framer-motion';
 import { DndContext,TouchSensor, closestCenter, useSensor, useSensors, MouseSensor } from '@dnd-kit/core';
 import { ThreeDot } from 'react-loading-indicators';
-import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { useNavigate } from 'react-router-dom';import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { useInView } from 'react-intersection-observer';
 export function Bord() {
   const [boardMenu,setBoardMenu]=useState(false);
@@ -26,6 +26,7 @@ export function Bord() {
   const [lists, setlists] = useState([]);
   const location=useLocation();
   const Board=location.state;
+  const navigate = useNavigate();
   const [BoardTitle,setBoardTitle] = useState("");
   const [loading, setLoading] = useState(true);
   const [Boards2,setBoards2]=useState(Board);
@@ -33,6 +34,21 @@ export function Bord() {
   const [sharedWith,setsharedWith]=useState(Board.sharedWith);
   const [background,setBackground] = useState("");
   const [backgroundImage,setBackgroundImage] = useState("");
+  const [deleteMenu,setDeleteMenu] = useState(false);
+  const deleteRef=useRef(null);
+  const handleClickOutsideForDelete = (event) => {
+    if (deleteRef.current && !deleteRef.current.contains(event.target)) {
+      setDeleteMenu(false);
+    }
+  };
+  useEffect(() => {
+     
+    document.addEventListener('mousedown', handleClickOutsideForDelete);
+    return () => {
+      
+      document.removeEventListener('mousedown', handleClickOutsideForDelete);
+    };
+  }, []);
   const menuVariants = {
     hidden: { opacity: 0, x: '100%' }, 
     visible: { opacity: 1, x: '0%' }, 
@@ -428,7 +444,31 @@ const handleBackgroundImgClick = async (bgClass) => {
       console.error('User is not authenticated');
     }
   };
+  const DeleteBoard=async()=>{
+    const user = auth.currentUser;
+    if (user) {
+      try {
+     
+    
+        const listDocRef = doc(db, `users/${user.uid}/Boards/${Board.id}`);
+        await deleteDoc(listDocRef);
   
+        const sharedDeletePromises = sharedWith.map((sharedUser) => {
+          const sharedListDocRef = doc(db, `users/${sharedUser.id}/Boards/${Board.id}`);
+          return deleteDoc(sharedListDocRef);
+        });
+  
+
+        await Promise.all(sharedDeletePromises);
+
+        navigate('/Home');
+      } catch (error) {
+        console.error("Error deleting card: ", error);
+      }
+    } else {
+      console.error("User is not authenticated");
+    }
+  }
   const handleClickOutside = (event) => {
     
     if (
@@ -562,14 +602,14 @@ const handleBackgroundImgClick = async (bgClass) => {
           </div>
         </div>
       )}
-<nav className='bg-gray-400 bg-opacity-55 sm:bg-opacity-50 py-2.5 pl-3.5 pr-2 sm:pr-5 text-md  absolute w-screen items-center top-11'> 
+<nav className='bg-gray-400 bg-opacity-55 sm:bg-opacity-50 py-2 pl-3.5 pr-2 sm:pr-5 text-md  absolute w-screen items-center top-11'> 
   <div className='flex justify-between'>
     <div className='flex gap-5'>
-      <p className='text-white font-bold text-md sm:text-xl cursor-pointer'>{BoardTitle}</p>
+      <p className='text-white font-bold text-2xl cursor-pointer'>{BoardTitle}</p>
       <div className="relative inline-block text-left" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="sm:text-lg text-slate-100 text-md px-1.5 flex gap-1 hover:text-gray-900 rounded-md hover:bg-slate-100 items-center"
+          className="sm:text-lg text-slate-100 text-md px-1.5 mt-1 sm:mt-0.5 flex gap-1  hover:text-gray-900 rounded-md hover:bg-slate-100 items-center"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
@@ -598,16 +638,40 @@ const handleBackgroundImgClick = async (bgClass) => {
     </div>
   </div>
 </nav>
+{deleteMenu&&(<div  className='flex justify-center items-center w-screen h-screen fixed bg-gray-700 bg-opacity-35 z-[1000000]'>
+<div ref={deleteRef} className=' relative flex flex-col z-[10000] justify-center items-center  border-t-2 border-red-600 p-2 pb-5 px-4 sm:px-5 rounded-lg bg-gray-900 w-fit max-w-[90%] h-fit'>
+<svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5} 
+      stroke="currentColor"
+      className="size-16 z-50 text-gray-200 bg-red-600 rounded-full p-1.5 absolute top-[-33px] " 
+    >
+      <path
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+      />
+    </svg>
+    <h1 className="text-xl text-center mb-2 font-bold mt-10 text-gray-300">Delete Board?</h1>
+    <p mb-5 className="text-sm text-center text-gray-300">Are you sure? This action will delete the board for all shared users and cannot be undone.</p>
+    <div className='flex justify-center mt-7 gap-10'>
+      <button onClick={()=>{setDeleteMenu(false)}} className='px-8 rounded-lg p-1.5 hover:bg-zinc-600 text-gray-100 bg-zinc-500 '>Cancel</button>
+      <button onClick={DeleteBoard} className='px-8 rounded-lg p-1.5 text-gray-100 bg-red-600 hover:bg-red-800'>Delete</button>
+    </div>
+   </div>
+</div>)}
 <AnimatePresence>
       {boardMenu && (
         <motion.div
           ref={dropdownRef}
           className='h-full p-4 px-3 top-11 flex flex-col w-60 sm:w-72 fixed z-[10000] right-0 bg-gray-800'
-          initial="hidden"       // Set the initial state
-          animate="visible"      // Set the visible state
-          exit="hidden"          // Set the exit state
-          variants={menuVariants} // Apply the variants
-          transition={{ duration: 0.3 }} // Transition duration
+          initial="hidden"       
+          animate="visible"      
+          exit="hidden"         
+          variants={menuVariants} 
+          transition={{ duration: 0.3 }} 
         >
           <div className='w-full relative flex items-start justify-between '>
             <h1 className='text-center text-xl flex-grow text-gray-300 '>Menu</h1>
@@ -646,6 +710,7 @@ const handleBackgroundImgClick = async (bgClass) => {
               ))}
             </div>
           </div>
+      
           <div className='color max-h-[20vh] mt-1 sm:max-h-[17vh] pt-1 rounded-md sm:px-3 px-2 overflow-y-scroll bg-gray-900'>
             <div className='grid grid-cols-2 mt-1 p-1 gap-5'>
               {imgBackground.map((img) => (
@@ -666,20 +731,36 @@ const handleBackgroundImgClick = async (bgClass) => {
                       visibility: 'hidden',
                     }}
                     onLoad={(e) => {
-                      // Once low-res image is loaded, load high-res image
-                      const highResImg = e.target.src.replace('-lowres.jpg', '.jpg'); // Change back to high-res image
+                   
+                      const highResImg = e.target.src.replace('-lowres.jpg', '.jpg'); 
                       const imgElement = new Image();
                       imgElement.src = highResImg;
                       imgElement.onload = () => {
-                        e.target.src = highResImg; // Set high-res image src
-                        e.target.style.visibility = 'visible'; // Make it visible
+                        e.target.src = highResImg;
+                        e.target.style.visibility = 'visible'; 
                       };
                     }}
                   />
                 </div>
               ))}
+              
             </div>
+
           </div>
+          <div className='flex mt-8 justify-center'><button onClick={()=>{setDeleteMenu(!deleteMenu); setBoardMenu(false)}} className='text-gray-300 text-md flex gap-1 p-1.5 px-4 rounded-xl shadow-lg  bg-gray-900 border-2 border-slate-400 hover:border-red-600 hover:bg-slate-800'> <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5} 
+      stroke="currentColor"
+      className="size-5 mr-0.5 text-red-600" 
+    >
+      <path
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+      />
+    </svg>Delete</button></div>
         </motion.div>
       )}
     </AnimatePresence>

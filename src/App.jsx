@@ -6,6 +6,7 @@ import { Home } from './Home';
 import { NavBar } from './NavBar';
 import { Login } from './Login';
 import {CardsArchive} from './CardsArchive';
+import { CreateBoardForNav } from'./CreateBoardForNav';
 function App() {
   return (
     <Router>
@@ -26,6 +27,7 @@ function Main() {
         <Route path="/Home" element={<Home/>} />
         <Route path="/" element={<Login />} />
         <Route path="/Board/:id" element={<Bord />} />
+        <Route path="/CreateBoard" element={<CreateBoardForNav />} />
       </Routes>
     </div>
   );
